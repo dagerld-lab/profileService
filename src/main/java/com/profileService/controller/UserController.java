@@ -27,63 +27,61 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RestController
 @Api(tags = { "ProfileService" })
 public class UserController {
-	
+
 	@Autowired
 	UserService userService;
 
-	
-	//---------------------------------------------------------------------
-	@ApiResponses(value = { 
-			  @ApiResponse(responseCode = "200", description = "Registrar Usuario", 
-			    content = { @Content(mediaType = "application/json", 
-			      schema = @Schema(implementation = User.class)) })})
+	// ---------------------------------------------------------------------
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Registrar Usuario", content = {
+					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }) })
 	@PostMapping("/service/v1/userSave")
-	public Response saveUser(@RequestBody User user){
-		
+	public Response saveUser(@RequestBody User user) {
+
 		return userService.saveUser(user);
 	}
-	
-	//---------------------------------------------------------------------
-	@ApiResponses(value = { 
-			  @ApiResponse(responseCode = "200", description = "Actualizar Usuario", 
-			    content = { @Content(mediaType = "application/json", 
-			      schema = @Schema(implementation = User.class)) })})
+
+	// ---------------------------------------------------------------------
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Actualizar Usuario", content = {
+					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }) })
 	@PostMapping("/service/v1/updateUser")
-	public ResponseUser updateUser(@RequestBody UpdateUser user){
-		
+	public ResponseUser updateUser(@RequestBody User user) {
+
 		return userService.updateUser(user);
 	}
-	
-	
-	
-	//---------------------------------------------------------------------
-	@PostMapping("/service/v1/findUserEmail/{email}")
-	public ResponseUser findUserEmail(@PathVariable String email){
-		
+
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Actualizar Preferencias", content = {
+					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }) })
+	@PostMapping("/service/v1/updatePreferences")
+	public ResponseUser updatePreferences(@RequestBody User user) {
+		return userService.updatePreferences(user);
+	}
+
+	// ---------------------------------------------------------------------
+	@GetMapping("/service/v1/findUserEmail/{email}")
+	public ResponseUser findUserEmail(@PathVariable String email) {
+
 		return userService.findUser(email);
 	}
-	
-	
-	
-	
-	//---------------------------------------------------------------------
+
+	// ---------------------------------------------------------------------
 	@PostMapping("/service/v1/deleteUser/{email}")
-	public Response deleteUser(@PathVariable String email){
-		
+	public Response deleteUser(@PathVariable String email) {
+
 		return userService.deleteUser(email);
 	}
-	
-	
+
 	@PostMapping("/service/v1/activeUser/{email}")
-	public Response activeUser(@PathVariable String email){
-		
+	public Response activeUser(@PathVariable String email) {
+
 		return userService.activeUser(email);
 	}
-	
+
 	@GetMapping("/service/v1/findAllUsers")
-	public ResponseUser findAllUsers(){
-		
+	public ResponseUser findAllUsers() {
+
 		return userService.findAllUser();
 	}
 }
-

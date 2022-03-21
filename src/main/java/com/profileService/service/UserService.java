@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.log4j.Log4j2;
+
 import com.profileService.entity.User;
+import com.profileService.enums.AuthType;
 import com.profileService.model.Response;
 import com.profileService.model.ResponseUser;
 import com.profileService.model.UpdateUser;
 import com.profileService.repository.UserRepository;
 
 @Service
+@Log4j2
 public class UserService {
 
 	@Autowired
@@ -24,23 +26,27 @@ public class UserService {
 
 	/// METODO CREAR USUARIO
 	public Response saveUser(User user) {
-		System.out.print(user);
+		log.info(user);
 		Response response = new Response();
 		User userUpdate = new User();
 		userUpdate = userRepository.findByEmail(user.getEmail());
 		try {
-			
-			if(userUpdate == null){
-				
-				user.setPassword(encoder().encode(user.getPassword()));
+
+			if (userUpdate == null) {
+				log.info("No existe el usuario");
+				log.info(AuthType.EMAIL.name());
+				log.info(user.getType());
+				if (user.getType().equals(AuthType.EMAIL.name())) {
+					user.setPassword(encoder().encode(user.getPassword()));
+				}
+				user.setStatus("A");
 				userRepository.save(user);
 				response.setCode("0");
 				response.setMessage("El usuario " + user.getName() + " se creo con exito");
-			}else{
+			} else {
 				response.setCode("-1");
 				response.setMessage("El usuario ya existe");
 			}
-		
 
 		} catch (Exception e) {
 			response.setCode("-1");
@@ -52,9 +58,8 @@ public class UserService {
 
 	}
 
-
-	//METODO ACTUALIZAR USUARIO
-	public ResponseUser updateUser(UpdateUser user) {
+	// METODO ACTUALIZAR USUARIO
+	public ResponseUser updateUser(User user) {
 
 		ResponseUser response = new ResponseUser();
 		User userUpdate = new User();
@@ -62,9 +67,11 @@ public class UserService {
 
 		try {
 			if (userUpdate != null) {
-				List<User> lista = new  ArrayList<User>();
+				List<User> lista = new ArrayList<User>();
 				userUpdate.setName(user.getName());
-				userUpdate.setLastname(user.getLastname());
+				userUpdate.setAge(user.getAge());
+				userUpdate.setCountry(user.getCountry());
+				userUpdate.setImageProfileBytes(user.getImageProfileBytes());
 				userRepository.save(userUpdate);
 				response.setCode("0");
 				response.setMessage("Se actualizo con exito");
@@ -85,35 +92,32 @@ public class UserService {
 		return response;
 	}
 
-	
-	//BUSCAR USUARIO POR CORREO
-	public ResponseUser findUser(String email){
-	
+	// BUSCAR USUARIO POR CORREO
+	public ResponseUser findUser(String email) {
+
 		ResponseUser response = new ResponseUser();
 		User user = new User();
 		try {
 			user = userRepository.findByEmail(email);
-			if(user != null){
-			List<User> lista = new  ArrayList<User>();
-			response.setCode("0");
-			response.setMessage("exito en la consulta de: " +email);
-			lista.add(user);
-			response.setUser(lista);		
-			}else{
+			if (user != null) {
+				List<User> lista = new ArrayList<User>();
+				response.setCode("0");
+				response.setMessage("exito en la consulta de: " + email);
+				lista.add(user);
+				response.setUser(lista);
+			} else {
 				response.setCode("-1");
 				response.setMessage("El usuario no existe");
 			}
-			
-		} catch (Exception e) {		
+
+		} catch (Exception e) {
 			response.setCode("-2");
-			response.setMessage("Ocurrio un error de exception: " +e.getMessage());
-		}	
+			response.setMessage("Ocurrio un error de exception: " + e.getMessage());
+		}
 		return response;
 	}
 
-	
-	
-	//INACTIVAR USUARIO
+	// INACTIVAR USUARIO
 	public Response deleteUser(String email) {
 
 		Response response = new Response();
@@ -121,27 +125,24 @@ public class UserService {
 		try {
 
 			userDelete = userRepository.findByEmail(email);
-			if(userDelete != null){
+			if (userDelete != null) {
 				userDelete.setStatus("I");
 				userRepository.save(userDelete);
 				response.setCode("0");
-				response.setMessage("Se elimino el usuario "+userDelete.getName());
-			}else{
+				response.setMessage("Se elimino el usuario " + userDelete.getName());
+			} else {
 				response.setCode("-1");
 				response.setMessage("El usuario no existe");
 			}
-			
 
 		} catch (Exception e) {
 			response.setCode("-2");
-			response.setMessage("Ocurrio un error de exception: " +e.getMessage());
+			response.setMessage("Ocurrio un error de exception: " + e.getMessage());
 		}
 		return response;
 
 	}
-	
-	
-	
+
 	public Response activeUser(String email) {
 
 		Response response = new Response();
@@ -149,55 +150,80 @@ public class UserService {
 		try {
 
 			userDelete = userRepository.findByEmail(email);
-			if(userDelete != null){
+			if (userDelete != null) {
 				userDelete.setStatus("A");
 				userRepository.save(userDelete);
 				response.setCode("0");
-				response.setMessage("Se activo el usuario "+userDelete.getName());
-			}else{
+				response.setMessage("Se activo el usuario " + userDelete.getName());
+			} else {
 				response.setCode("-1");
 				response.setMessage("El usuario no existe");
 			}
-			
 
 		} catch (Exception e) {
 			response.setCode("-2");
-			response.setMessage("Ocurrio un error de exception: " +e.getMessage());
+			response.setMessage("Ocurrio un error de exception: " + e.getMessage());
 		}
 		return response;
 
 	}
-	
-	
-	public ResponseUser findAllUser(){
-		
+
+	public ResponseUser findAllUser() {
+
 		ResponseUser response = new ResponseUser();
-		List<User> lista = new  ArrayList<User>();
+		List<User> lista = new ArrayList<User>();
 		try {
 			lista = userRepository.findAll();
-			if(lista != null){
-			
-			response.setCode("0");
-			response.setMessage("exito en la consulta de: ");
-			response.setUser(lista);		
-			}else{
+			if (lista != null) {
+
+				response.setCode("0");
+				response.setMessage("exito en la consulta de: ");
+				response.setUser(lista);
+			} else {
 				response.setCode("-1");
 				response.setMessage("No hay registros");
 			}
-			
-		} catch (Exception e) {		
+
+		} catch (Exception e) {
 			response.setCode("-2");
-			response.setMessage("Ocurrio un error de exception: " +e.getMessage());
-		}	
+			response.setMessage("Ocurrio un error de exception: " + e.getMessage());
+		}
 		return response;
 	}
-	
-	
-	
-	public PasswordEncoder encoder(){
+
+	public PasswordEncoder encoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-	
+
+    public ResponseUser updatePreferences(User user) {
+      
+		ResponseUser response = new ResponseUser();
+		User userUpdate = new User();
+		userUpdate = userRepository.findByEmail(user.getEmail());
+
+		try {
+			if (userUpdate != null) {
+				List<User> lista = new ArrayList<User>();
+				userUpdate.setDistance(user.getDistance());
+				userUpdate.setInterests(user.getInterests());
+				userRepository.save(userUpdate);
+				response.setCode("0");
+				response.setMessage("Se actualizo con exito");
+				lista.add(userUpdate);
+				response.setUser(lista);
+			} else {
+				response.setCode("-1");
+				response.setMessage("No actualizo");
+				response.setUser(null);
+			}
+
+		} catch (Exception e) {
+			response.setCode("-1");
+			response.setMessage("Ocurrio una exception de " + e.getMessage());
+			response.setUser(null);
+		}
+
+		return response;
+    }
 
 }
