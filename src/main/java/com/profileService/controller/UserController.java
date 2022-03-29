@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.profileService.entity.User;
+import com.profileService.model.RequestFavourite;
 import com.profileService.model.Response;
 import com.profileService.model.ResponseUser;
 import com.profileService.model.UpdateUser;
@@ -59,6 +60,14 @@ public class UserController {
 		return userService.updatePreferences(user);
 	}
 
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Actualizar Preferencias", content = {
+					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }) })
+	@PostMapping("/service/v1/updateFavourite")
+	public ResponseUser updateFavourite(@RequestBody RequestFavourite requestFavourite) {
+		return userService.updateFavourite(requestFavourite);
+	}
+
 	// ---------------------------------------------------------------------
 	@GetMapping("/service/v1/findUserEmail/{email}")
 	public ResponseUser findUserEmail(@PathVariable String email) {
@@ -84,4 +93,5 @@ public class UserController {
 
 		return userService.findAllUser();
 	}
+
 }

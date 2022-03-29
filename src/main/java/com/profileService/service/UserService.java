@@ -1,7 +1,9 @@
 package com.profileService.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,9 +14,9 @@ import lombok.extern.log4j.Log4j2;
 
 import com.profileService.entity.User;
 import com.profileService.enums.AuthType;
+import com.profileService.model.RequestFavourite;
 import com.profileService.model.Response;
 import com.profileService.model.ResponseUser;
-import com.profileService.model.UpdateUser;
 import com.profileService.repository.UserRepository;
 
 @Service
@@ -73,6 +75,7 @@ public class UserService {
 				userUpdate.setCountry(user.getCountry());
 				userUpdate.setImageProfileBytes(user.getImageProfileBytes());
 				userRepository.save(userUpdate);
+				userUpdate.setPassword(null);
 				response.setCode("0");
 				response.setMessage("Se actualizo con exito");
 				lista.add(userUpdate);
@@ -103,6 +106,7 @@ public class UserService {
 				List<User> lista = new ArrayList<User>();
 				response.setCode("0");
 				response.setMessage("exito en la consulta de: " + email);
+				user.setPassword(null);
 				lista.add(user);
 				response.setUser(lista);
 			} else {
@@ -195,8 +199,8 @@ public class UserService {
 		return new BCryptPasswordEncoder();
 	}
 
-    public ResponseUser updatePreferences(User user) {
-      
+	public ResponseUser updatePreferences(User user) {
+
 		ResponseUser response = new ResponseUser();
 		User userUpdate = new User();
 		userUpdate = userRepository.findByEmail(user.getEmail());
@@ -209,6 +213,7 @@ public class UserService {
 				userRepository.save(userUpdate);
 				response.setCode("0");
 				response.setMessage("Se actualizo con exito");
+				userUpdate.setPassword(null);
 				lista.add(userUpdate);
 				response.setUser(lista);
 			} else {
@@ -224,6 +229,35 @@ public class UserService {
 		}
 
 		return response;
-    }
+	}
+
+	public ResponseUser updateFavourite(RequestFavourite requestFavourite) {
+		ResponseUser response = new ResponseUser();
+		try {
+
+			User userUpdate = userRepository.findByEmail(requestFavourite.getEmail());
+			List<String> favourites = Arrays
+					.asList(userUpdate.getFavourites() != null ? userUpdate.getFavourites() : new String[] {});
+			if (favourites.contains(requestFavourite.getPlaceId())) {
+				 favourites = favourites.stream().filter(x -> !x.equalsIgnoreCase(requestFavourite.getPlaceId())).collect(Collectors.toList());
+				userUpdate.setFavourites(favourites.toArray(new String[favourites.size()]));
+			} else {
+				favourites = new ArrayList<>();
+				favourites.add(requestFavourite.getPlaceId());
+				userUpdate.setFavourites(favourites.toArray(new String[favourites.size()]));
+			}
+			userRepository.save(userUpdate);
+			userUpdate.setPassword(null);
+			response.setCode("0");
+			response.setMessage("Se actualizo con exito");
+			response.setUser(Arrays.asList(userUpdate));
+		} catch (Exception e) {
+			log.error("Error al actualizar los favoritos: " + e.getMessage());
+			response.setCode("-1");
+			response.setMessage("Ocurrio una exception de " + e.getMessage());
+			response.setUser(null);
+		}
+		return response;
+	}
 
 }

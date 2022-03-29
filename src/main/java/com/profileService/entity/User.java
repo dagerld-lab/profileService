@@ -1,6 +1,8 @@
 package com.profileService.entity;
 
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -28,14 +30,16 @@ public class User {
 	private String[] interests;
 	private double distance;
 	private String[] favourites;
+	private List<String> devices;
 
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", email=" + email + ", password=" + password + ", status="
-				+ status + ", lastname=" + lastname + ", rol=" + rol + ", imageProfile=" + imageProfile + ", age="
-				+ age + ", country=" + country + ", type=" + type + ", interests=" + interests + ", distance=" + distance
-				+ ", favourites=" + favourites + "]";
+				+ status + ", lastname=" + lastname + ", rol=" + rol + ", imageProfile=" + imageProfile
+				+ ", imageProfileBytes=" + imageProfileBytes + ", age=" + age + ", country=" + country + ", type=" + type
+				+ ", interests=" + interests + ", distance=" + distance + ", favourites=" + favourites + ", devices="
+				+ devices + "]";
 	}
 
 	

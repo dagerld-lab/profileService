@@ -29,32 +29,39 @@ public class LoginService {
 			userUpdate = userRepository.findByEmail(request.getEmail());
 
 			if (userUpdate != null) {
-				if(request.getType().equalsIgnoreCase(userUpdate.getType())) {
+				if (request.getType().equalsIgnoreCase(userUpdate.getType())) {
 					if (userUpdate.getType().equalsIgnoreCase(AuthType.EMAIL.name())) {
 						boolean pass = encoder.matches(request.getPassword(), userUpdate.getPassword());
 						if (pass) {
-							response.setCode("0");
-							response.setMessage("exito al en login");
+
 							List<User> lista = new ArrayList<User>();
+							if (!userUpdate.getDevices().contains(request.getDevice())) {
+								userUpdate.getDevices().add(request.getDevice());
+								userRepository.save(userUpdate);
+							}
 							userUpdate.setPassword(null);
 							lista.add(userUpdate);
-	
 							response.setUser(lista);
+							response.setCode("0");
+							response.setMessage("exito al en login");
 						} else {
 							response.setCode("-1");
 							response.setMessage("Crendenciales incorrectas");
 							response.setUser(null);
 						}
 					} else {
+						if (!userUpdate.getDevices().contains(request.getDevice())) {
+							userUpdate.getDevices().add(request.getDevice());
+							userRepository.save(userUpdate);
+						}
+						userUpdate.setPassword(null);
+						List<User> lista = new ArrayList<User>();
+						lista.add(userUpdate);
 						response.setCode("0");
 						response.setMessage("exito al en login");
-						List<User> lista = new ArrayList<User>();
-						userUpdate.setPassword(null);
-						lista.add(userUpdate);
-	
 						response.setUser(lista);
 					}
-				}else{
+				} else {
 					response.setCode("-1");
 					response.setMessage("Crendenciales incorrectas");
 					response.setUser(null);
