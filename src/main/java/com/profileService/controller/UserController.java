@@ -1,6 +1,5 @@
 package com.profileService.controller;
 
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,14 +12,10 @@ import com.profileService.entity.User;
 import com.profileService.model.RequestFavourite;
 import com.profileService.model.Response;
 import com.profileService.model.ResponseUser;
-import com.profileService.model.UpdateUser;
 import com.profileService.service.UserService;
 
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.Api;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

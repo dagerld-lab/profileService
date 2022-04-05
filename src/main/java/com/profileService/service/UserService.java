@@ -236,15 +236,17 @@ public class UserService {
 		try {
 
 			User userUpdate = userRepository.findByEmail(requestFavourite.getEmail());
-			List<String> favourites = Arrays
-					.asList(userUpdate.getFavourites() != null ? userUpdate.getFavourites() : new String[] {});
+				List<String> favourites = userUpdate.getFavourites();
+			if(favourites==null){
+				favourites=new ArrayList<String>();
+			}
 			if (favourites.contains(requestFavourite.getPlaceId())) {
-				 favourites = favourites.stream().filter(x -> !x.equalsIgnoreCase(requestFavourite.getPlaceId())).collect(Collectors.toList());
-				userUpdate.setFavourites(favourites.toArray(new String[favourites.size()]));
+				favourites = favourites.stream().filter(x -> !x.equalsIgnoreCase(requestFavourite.getPlaceId()))
+						.collect(Collectors.toList());
+				userUpdate.setFavourites(favourites);
 			} else {
-				favourites = new ArrayList<>();
 				favourites.add(requestFavourite.getPlaceId());
-				userUpdate.setFavourites(favourites.toArray(new String[favourites.size()]));
+				userUpdate.setFavourites(favourites);
 			}
 			userRepository.save(userUpdate);
 			userUpdate.setPassword(null);

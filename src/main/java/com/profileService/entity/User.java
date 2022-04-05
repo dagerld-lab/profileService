@@ -29,7 +29,7 @@ public class User {
 	private String type;
 	private String[] interests;
 	private double distance;
-	private String[] favourites;
+	private List<String> favourites;
 	private List<String> devices;
 
 
