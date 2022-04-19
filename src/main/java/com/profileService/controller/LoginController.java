@@ -1,6 +1,7 @@
 package com.profileService.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import io.swagger.annotations.Api;
 
 @RestController
 @Api(tags = { "LoginService" })
+@CrossOrigin(origins = "*")
 public class LoginController {
 	
 	@Autowired
